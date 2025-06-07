@@ -1,23 +1,34 @@
-import { createContext, useState } from "react";
+import { createContext, useState ,useEffect } from "react";
 import { toast } from "react-toastify";
 import axios from "axios";
 
 export const AdminContext = createContext();
 
 const AdminContextProvider = (props) => {
-  const [aToken, setAToken] = useState(
-    localStorage.getItem("aToken") ? localStorage.getItem("aToken") : ""
-  );
+  // const [aToken, setAToken] = useState(
+  //   localStorage.getItem("aToken") ? localStorage.getItem("aToken") : ""
+  // );
+  const [aToken, setAToken] = useState(() => localStorage.getItem("aToken") || "");
+
   const [doctors, setDoctors] = useState([]);
   const [appointments, setAppointments] = useState([]);
   const [dashData, setDashData] = useState(false);
   const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
+  // Sync token to localStorage whenever it changes
+useEffect(() => {
+  localStorage.setItem("aToken", aToken);
+}, [aToken]);
+
+
   const getAllDoctors = async () => {
     try {
+      console.log("Sending token:", aToken);
       // const {data}=await axios.post(backendUrl+'api/admin/all-doctors',{},{headers:{aToken}})
       const { data } = await axios.get(`${backendUrl}/api/admin/all-doctors`, {
-        headers: { aToken },
+        // headers: { aToken },
+        headers: { Authorization: `Bearer ${aToken}`,
+  },
       });
       if (data.success) {
         setDoctors(data.doctors);
@@ -37,7 +48,8 @@ const AdminContextProvider = (props) => {
       const { data } = await axios.post(
         backendUrl + "/api/admin/change-availability",
         { docId },
-        { headers: { aToken } }
+        // { headers: { aToken } }
+        { headers: { Authorization: `Bearer ${aToken}` } }
       );
       if (data.success) {
         toast.success(data.message);
@@ -55,7 +67,9 @@ const AdminContextProvider = (props) => {
   const getAllAppointments = async () => {
     try {
       const { data } = await axios.get(backendUrl + "/api/admin/appointments", {
-        headers: { aToken },
+        // headers: { aToken },
+         headers: { Authorization: `Bearer ${aToken}` } 
+
       });
       if (data.success) {
         setAppointments(data.appointments);
@@ -74,7 +88,9 @@ const AdminContextProvider = (props) => {
         const { data } = await axios.post(
           backendUrl + "/api/admin/cancel-appointment",
           { appointmentId },
-          { headers: { aToken } }
+          // { headers: { aToken } }
+              { headers: { Authorization: `Bearer ${aToken}` } }
+
         );
       if (data.success) {
         toast.success(data.message)
@@ -91,11 +107,13 @@ const AdminContextProvider = (props) => {
   const getDashData = async () => {
     try {
         const { data } = await axios.get(backendUrl + "/api/admin/dashboard", {
-          headers: { aToken },
+          // headers: { aToken },
+          headers: { Authorization: `Bearer ${aToken}` } 
+
         });
         if (data.success) {
           setDashData(data.dashData);
-        //   console.log(data.dashData);
+          console.log(data.dashData);
         } else {
           toast.error(data.message);
         }

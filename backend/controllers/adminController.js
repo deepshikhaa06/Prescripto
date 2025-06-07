@@ -66,7 +66,14 @@ const loginAdmin =async (req, res) => {
         const {email, password}=req.body
         //*CHECK IF ADMIN EXISTS
         if(email===process.env.ADMIN_EMAIL && password===process.env.ADMIN_PASSWORD) {
-            const token = jwt.sign(email+password, process.env.JWT_SECRET)
+            // const token = jwt.sign(email+password, process.env.JWT_SECRET)
+            //!Chatgpt
+            const token = jwt.sign(
+  { email: process.env.ADMIN_EMAIL }, 
+  process.env.JWT_SECRET,
+  { expiresIn: '1d' }
+);
+
             res.json({success:true,message:"Admin logged in",aToken:token})
         }else{
             return res.json({message:"Invalid credentials",success:false})

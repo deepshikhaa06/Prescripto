@@ -16,17 +16,23 @@ const Login = () => {
     try {
         if(state==="Admin"){
             const {data}=await axios.post(backendUrl+'/api/admin/login', {email,password})
+              console.log("Admin login response:", data); // 👈 add this
             if(data.success){
-                console.log(data.token);
-                localStorage.setItem('aToken',data.token)
-                setAToken(data.token)
+                console.log("Token received:",data.token);
+                console.log(" aToken Token received:", data.aToken); // 👈 add this
+                // localStorage.setItem('aToken',data.token)
+                // setAToken(data.token)
+                localStorage.setItem('aToken',data.aToken)
+                setAToken(data.aToken)
+                navigate("/admin/dashboard");
             }else{
                 toast.error(data.message)
             }
-        }else{
+        } 
+        else{
           const {data}=await axios.post(backendUrl+'/api/doctor/login',{email,password})
           if(data.success){
-            // console.log("local storage successfully",data.token)
+            console.log("local storage successfully",data.token)
             localStorage.setItem("dToken", data.token)
             setDToken(data.token)
             // console.log(data.token);
